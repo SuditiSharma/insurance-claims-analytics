@@ -1,6 +1,6 @@
 # Insurance Claims Analytics & Fraud Risk Dashboard
 
-> 🚧 **Work in progress.** Data preparation and SQL analysis are complete; Python visualisations and the Power BI dashboard are being added.
+> 🚧 **Work in progress.** Data preparation, SQL analysis and Python visualisations are complete; the Power BI dashboard is being built.
 
 ## Overview
 
@@ -28,7 +28,7 @@ This project turns raw claims data into answers to those questions.
 
 ## Tools
 
-Python (Pandas, NumPy) · SQL (SQLite) · Power BI · DAX · Git/GitHub
+Python (Pandas, NumPy, Matplotlib) · SQL (SQLite) · Power BI · DAX · Git/GitHub
 
 ## Project Structure
 
@@ -44,7 +44,12 @@ insurance-claims-analytics/
 │   ├── 02_claims_performance.sql     # trends, seasonality, regional SLA
 │   ├── 03_fraud_analysis.sql         # fraud patterns and risk concentration
 │   └── 04_operational_analysis.sql   # bottlenecks, documents, handlers, channels
-├── insurance_claims_analysis.ipynb   # cleaning, feature engineering, analysis
+├── powerbi/
+│   ├── build_powerbi_tables.py       # builds the star schema for Power BI
+│   └── dax_measures.md               # DAX measures used in the report
+├── charts/                           # charts exported from the notebook
+├── insurance_claims_analysis.ipynb        # cleaning, feature engineering, risk score
+├── insurance_claims_visualisations.ipynb  # 9 charts with business insights
 └── README.md
 ```
 
@@ -55,9 +60,9 @@ insurance-claims-analytics/
 - [x] Feature engineering (SLA status, settlement ratio, documentation status, reporting lag, risk score)
 - [x] Basic SQL analysis
 - [x] Intermediate SQL (CTEs, window functions, joins, subqueries)
-- [ ] Python visualisations
+- [x] Python visualisations (9 charts with business insights)
 - [ ] Power BI dashboard
-- [ ] Final business recommendations
+- [x] Business recommendations
 
 ## Data Cleaning
 
@@ -109,7 +114,29 @@ Aggregations · `CASE` · CTEs (`WITH`) · subqueries · `HAVING` · `UNION ALL`
 8. **Channels:** Mobile App claims are processed fastest (8.1 days) with the highest satisfaction (3.84/5); Branch claims are slowest (10.9 days) with the lowest satisfaction (3.30/5).
 9. **Unresolved workload:** 27.4% of claims remain unresolved (Open, Pending Documents or Under Investigation).
 
-*More findings and business recommendations will be added as the analysis progresses.*
+## Visual Highlights
+
+| Fraud rate by reporting delay | Risk score distribution |
+|---|---|
+| ![Fraud by reporting delay](charts/09_fraud_by_reporting_delay.png) | ![Risk distribution](charts/08_risk_distribution.png) |
+
+| Processing time vs 7-day SLA | Monthly claim volume |
+|---|---|
+| ![Processing by type](charts/04_processing_by_type.png) | ![Claims by month](charts/01_claims_by_month.png) |
+
+All 9 charts, each with a written insight, are in [`insurance_claims_visualisations.ipynb`](insurance_claims_visualisations.ipynb).
+
+## Business Recommendations
+
+1. **Fast-track late-reported claims for review.** Claims reported 8+ days after the incident had a 78% fraud rate. A simple reporting-delay rule at first notification of loss would flag most suspicious claims early, at almost no cost.
+2. **Use the risk score to prioritise investigator workload.** The 4.4% of claims scored high risk hold 18% of claim value and over half of all fraud, so investigation capacity should be focused there first.
+3. **Introduce automated document completeness checks at claim intake.** Incomplete documentation more than doubles the SLA breach rate (78.9% vs 34.9%); chasing missing documents up front would remove a major source of delay.
+4. **Replace the single 7-day SLA with claim-type-specific targets.** Theft and fire claims cannot realistically be settled in 7 days; type-specific targets give managers a fairer and more actionable view of performance.
+5. **Review processes in the East region.** It has mid-level claim volume but the worst SLA performance (59.8% breach rate), which suggests a process or capacity issue rather than workload.
+6. **Encourage digital claim submission.** Mobile App claims are the fastest to process and have the highest customer satisfaction; Branch claims are the slowest and least satisfied.
+7. **Plan staffing for seasonal peaks.** Claim volume rises every July–September and again in December–January.
+
+*These recommendations are based on a synthetic dataset and are intended to demonstrate the analytical approach.*
 
 ## Author
 
