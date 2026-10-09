@@ -1,6 +1,6 @@
 # Insurance Claims Analytics & Fraud Risk Dashboard
 
-> 🚧 **Work in progress.** Data preparation and initial SQL analysis are complete; advanced SQL, Python visualisations and the Power BI dashboard are being added.
+> 🚧 **Work in progress.** Data preparation and SQL analysis are complete; Python visualisations and the Power BI dashboard are being added.
 
 ## Overview
 
@@ -40,7 +40,10 @@ insurance-claims-analytics/
 │   ├── insurance_claims.db           # SQLite database
 │   └── generate_claims_data.py       # data generator
 ├── sql/
-│   └── 01_basic_analysis.sql
+│   ├── 01_basic_analysis.sql         # headline KPIs
+│   ├── 02_claims_performance.sql     # trends, seasonality, regional SLA
+│   ├── 03_fraud_analysis.sql         # fraud patterns and risk concentration
+│   └── 04_operational_analysis.sql   # bottlenecks, documents, handlers, channels
 ├── insurance_claims_analysis.ipynb   # cleaning, feature engineering, analysis
 └── README.md
 ```
@@ -51,7 +54,7 @@ insurance-claims-analytics/
 - [x] Data cleaning (8 data-quality issues identified and resolved)
 - [x] Feature engineering (SLA status, settlement ratio, documentation status, reporting lag, risk score)
 - [x] Basic SQL analysis
-- [ ] Intermediate SQL (CTEs, window functions)
+- [x] Intermediate SQL (CTEs, window functions, joins, subqueries)
 - [ ] Python visualisations
 - [ ] Power BI dashboard
 - [ ] Final business recommendations
@@ -86,12 +89,25 @@ A rule-based score used to identify patterns associated with potentially suspici
 
 **0–2 = Low · 3–5 = Medium · 6+ = High**
 
+## SQL Techniques Used
+
+Aggregations · `CASE` · CTEs (`WITH`) · subqueries · `HAVING` · `UNION ALL` · `JOIN` to a lookup table · date functions (`strftime`) · window functions: `LAG`, running `SUM() OVER`, `RANK`, `ROW_NUMBER() OVER (PARTITION BY ...)`, `AVG() OVER (PARTITION BY ...)`
+
 ## Key Findings (so far)
 
-1. **Risk concentration:** High-risk claims make up ~4.4% of claim volume but ~18% of total claim value, with a fraud rate (~55%) roughly 50x that of low-risk claims.
-2. **SLA performance:** 43.6% of claims exceeded the 7-day processing target.
-3. **Claim type:** Theft claims have the highest average value (~₹6.76 lakh) and take nearly 3x longer to process than windscreen claims (15.9 vs 5.7 days).
-4. **Unresolved workload:** 27.4% of claims remain unresolved (Open, Pending Documents or Under Investigation).
+**Fraud & risk**
+1. **Risk concentration:** High-risk claims make up 4.4% of claim volume but 18.3% of total claim value, with a fraud rate (55.1%) roughly 50x that of low-risk claims (1.1%).
+2. **Late reporting is the strongest fraud signal:** claims reported 8+ days after the incident have a 78.1% fraud rate, compared with 0% for same-day reports.
+3. **Claim type:** Theft (20.1%) and fire (14.4%) claims have far higher fraud rates than windscreen claims (1.1%).
+4. **New policies:** policies held 6 months or less have more than double the fraud rate of established policies (11.7% vs 5.3%).
+
+**Operations**
+
+5. **SLA performance:** 43.6% of claims exceeded the 7-day processing target; the East region performs worst (59.8% breach rate vs 36.5% in the West).
+6. **Documentation:** claims with incomplete documents have a 78.9% SLA breach rate vs 34.9% for complete claims, and take 14.2 vs 8.1 days on average.
+7. **A single SLA misrepresents complex claims:** 89.5% of theft claims breach the 7-day target, but only 20.9% breach a realistic 21-day theft-specific target.
+8. **Channels:** Mobile App claims are processed fastest (8.1 days) with the highest satisfaction (3.84/5); Branch claims are slowest (10.9 days) with the lowest satisfaction (3.30/5).
+9. **Unresolved workload:** 27.4% of claims remain unresolved (Open, Pending Documents or Under Investigation).
 
 *More findings and business recommendations will be added as the analysis progresses.*
 
